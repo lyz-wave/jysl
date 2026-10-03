@@ -1,0 +1,491 @@
+@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css');
+@import "tailwindcss";
+
+:root {
+  /* 纸张与森林专属色盘 */
+  --paper-bg: #FAF7EE;
+  --paper-surface: #F5EFEB;
+  --paper-card: #FFFFFF;
+  --paper-shadow: rgba(60, 45, 30, 0.14);
+  
+  --forest-moss-dark: #23481F;
+  --forest-moss: #38662F;
+  --forest-moss-light: #5B8C4E;
+  --forest-mist: #E5EFE3;
+  --forest-bark: #4D3524;
+  --forest-bark-light: #7A583E;
+  
+  --paper-sun: #F5C542;
+  --paper-vermilion: #C84630;
+  --paper-dusk: #D96B43;
+  --paper-night-sky: #121F28;
+
+  --font-wenkai: 'LXGW WenKai', 'STKaiti', 'KaiTi', 'PingFang SC', serif;
+}
+
+@theme {
+  --color-paper-bg: var(--paper-bg);
+  --color-paper-surface: var(--paper-surface);
+  --color-paper-card: var(--paper-card);
+  --color-paper-shadow: var(--paper-shadow);
+  --color-moss-dark: var(--forest-moss-dark);
+  --color-moss: var(--forest-moss);
+  --color-moss-light: var(--forest-moss-light);
+  --color-mist: var(--forest-mist);
+  --color-bark: var(--forest-bark);
+  --color-bark-light: var(--forest-bark-light);
+  --color-sun: var(--paper-sun);
+  --color-vermilion: var(--paper-vermilion);
+  --color-dusk: var(--paper-dusk);
+  --color-night-sky: var(--paper-night-sky);
+  --font-wenkai: var(--font-wenkai);
+}
+
+body {
+  background-color: var(--paper-bg);
+  color: var(--forest-bark);
+  font-family: var(--font-wenkai);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 2.5D CSS 3D 舞台公共类 */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective-stage {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* 纸张边缘手作轻微粗糙/不规则感 */
+.paper-rough-edge {
+  clip-path: polygon(
+    0% 0.8%, 2.5% 0%, 5% 0.6%, 10% 0.2%, 18% 0.7%, 26% 0.1%, 35% 0.8%, 45% 0.2%, 55% 0.7%, 65% 0.1%, 75% 0.9%, 85% 0.3%, 94% 0.7%, 100% 0.2%,
+    99.6% 12%, 100% 24%, 99.4% 36%, 100% 50%, 99.5% 65%, 100% 78%, 99.3% 90%, 100% 100%,
+    94% 99.4%, 85% 100%, 75% 99.2%, 65% 99.8%, 55% 99.1%, 45% 99.9%, 35% 99.3%, 25% 99.8%, 15% 99.2%, 5% 99.7%, 0% 99.3%,
+    0.5% 88%, 0% 74%, 0.6% 60%, 0.1% 48%, 0.7% 35%, 0.2% 20%, 0.6% 10%
+  );
+}
+
+/* ==================== 苹果级液态玻璃与有机边缘 (Liquid Glass + Organic Edge) ==================== */
+.glass-card-paper {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.46) 48%,
+    rgba(250, 246, 238, 0.58) 100%
+  );
+  backdrop-filter: blur(28px) saturate(210%);
+  -webkit-backdrop-filter: blur(28px) saturate(210%);
+  border: 1.5px solid rgba(255, 255, 255, 0.82);
+  box-shadow:
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1.5px 2px 0 rgba(96, 78, 50, 0.10),
+    inset 0 0 32px 0 rgba(255, 255, 255, 0.22);
+}
+
+.glass-card-paper-dark {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.32) 0%,
+    rgba(255, 255, 255, 0.14) 48%,
+    rgba(240, 230, 215, 0.20) 100%
+  );
+  backdrop-filter: blur(30px) saturate(220%);
+  -webkit-backdrop-filter: blur(30px) saturate(220%);
+  border: 1.5px solid rgba(255, 255, 255, 0.52);
+  box-shadow:
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.22),
+    inset 0 0 36px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* 带有不规则手撕边缘 (clip-path) 元素的专用外部投影容器类 */
+.drop-shadow-paper-edge {
+  filter: drop-shadow(0 20px 48px rgba(0, 0, 0, 0.36))
+          drop-shadow(0 4px 14px rgba(45, 25, 10, 0.22));
+}
+
+.drop-shadow-paper-edge-sm {
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.22))
+          drop-shadow(0 2px 8px rgba(45, 25, 10, 0.14));
+}
+
+/* 纸质按钮微交互：轻按压感下陷 */
+.paper-press-btn {
+  box-shadow: 0 4px 0 rgba(77, 53, 36, 0.25), 0 6px 12px rgba(77, 53, 36, 0.12);
+  transition: all 0.12s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.paper-press-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 rgba(77, 53, 36, 0.28), 0 8px 16px rgba(77, 53, 36, 0.14);
+}
+
+.paper-press-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(77, 53, 36, 0.25), 0 2px 4px rgba(77, 53, 36, 0.1);
+}
+
+/* 立体书弹起 3D 旋转基底 */
+.popup-fold-origin {
+  transform-origin: bottom center;
+}
+
+/* 12fps 定格纸动画抽帧 timing-function */
+.stop-motion-12fps {
+  animation-timing-function: steps(4, end);
+}
+
+/* ==================== 2.5D 剪纸西洋景 (Paper-Cut Forest Diorama) 核心系统 ==================== */
+:root {
+  --diorama-cream: #f3e8d2;
+  --diorama-sage: #9bb89b;
+  --diorama-moss: #5f7f5b;
+  --diorama-teal: #274e52;
+  --diorama-ochre: #d9a45b;
+  --diorama-orange: #c8642d;
+  --diorama-ink: #3b2b1d;
+  --diorama-shade: rgba(58, 38, 18, 0.34);
+  --diorama-edge: rgba(255, 250, 236, 0.55);
+}
+
+.diorama-container.night {
+  --diorama-shade: rgba(6, 6, 32, 0.62);
+  --diorama-edge: rgba(176, 186, 255, 0.22);
+}
+
+/* 纸雕物理双重投影：上方刀切微亮白边 + 下方纸张厚度柔和投影 */
+.diorama-cut {
+  filter: drop-shadow(0 -1px 0 var(--diorama-edge))
+    drop-shadow(0 calc(var(--sh, 4) * 1px) calc(var(--sh, 4) * 1.5px) var(--diorama-shade));
+  transition: filter 1.2s ease var(--d, 0s);
+}
+
+/* 纸层置入动画 */
+.diorama-place > svg {
+  animation: dioramaPlaceIn 0.9s cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+@keyframes dioramaPlaceIn {
+  from {
+    transform: translateY(7%);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* 纸色过渡 */
+.diorama-container path,
+.diorama-container circle,
+.diorama-container ellipse {
+  transition: fill 1.25s cubic-bezier(0.55, 0.05, 0.3, 1) var(--d, 0s),
+    opacity 1.25s ease var(--d, 0s), stroke 1.25s ease var(--d, 0s);
+}
+
+/* 日夜昼夜纸浆色板配色阶梯 */
+.c-far { fill: #dfdec3; }
+.diorama-container.night .c-far { fill: #4a508f; }
+
+.c-hill { fill: #bdcfb2; }
+.diorama-container.night .c-hill { fill: #3e4487; }
+
+.c-roof { fill: #a8bd9c; }
+.diorama-container.night .c-roof { fill: #353b7b; }
+
+.c-win { fill: #8aa083; }
+.diorama-container.night .c-win { fill: #ffd57c; }
+
+.c-winglow { opacity: 0; transition: opacity 1.2s ease; }
+.diorama-container.night .c-winglow { opacity: 1; }
+
+.c-ridge { fill: #9bb89b; }
+.diorama-container.night .c-ridge { fill: #343a7c; }
+
+.c-meadow { fill: #7e9c74; }
+.diorama-container.night .c-meadow { fill: #2b3071; }
+
+.c-river { fill: #b7d2c8; }
+.diorama-container.night .c-river { fill: #5763ae; }
+
+.c-ripple { fill: #f1f2e3; }
+.diorama-container.night .c-ripple { fill: #b9c1f2; }
+
+.c-glint { fill: #fff3c9; opacity: 0; }
+.diorama-container.night .c-glint {
+  opacity: 0.95;
+  animation: dioramaGlint 2.6s ease-in-out infinite;
+}
+
+@keyframes dioramaGlint {
+  0%, 100% { opacity: 0.95; }
+  50% { opacity: 0.12; }
+}
+
+.c-moss { fill: #5f7f5b; }
+.diorama-container.night .c-moss { fill: #24295f; }
+
+.c-teal { fill: #274e52; }
+.diorama-container.night .c-teal { fill: #1a1d4e; }
+
+.c-ground { fill: #d9a45b; }
+.diorama-container.night .c-ground { fill: #352b63; }
+
+.c-burrow { fill: #4a3019; }
+.diorama-container.night .c-burrow { fill: #110e2a; }
+
+.c-stem { fill: #f0e3c6; }
+.diorama-container.night .c-stem { fill: #8d86b9; }
+
+.c-cap { fill: #c8642d; }
+.diorama-container.night .c-cap { fill: #7b3e6b; }
+
+.c-dot { fill: #f8efdc; }
+.diorama-container.night .c-dot { fill: #aef6e4; }
+
+.c-fern { fill: #5f7f5b; }
+.diorama-container.night .c-fern { fill: #262d62; }
+
+.c-fall1 { fill: #c9713a; }
+.diorama-container.night .c-fall1 { fill: #5a3766; }
+
+.c-fall2 { fill: #b98f4c; }
+.diorama-container.night .c-fall2 { fill: #443d78; }
+
+.c-tuft { fill: #8a9a55; }
+.diorama-container.night .c-tuft { fill: #2c2a5c; }
+
+.c-pebble { fill: #e9dcc0; }
+.diorama-container.night .c-pebble { fill: #5a5690; }
+
+.c-fg { fill: #1f4245; }
+.diorama-container.night .c-fg { fill: #121439; }
+
+.c-fg2 { fill: #3d6a50; }
+.diorama-container.night .c-fg2 { fill: #1b1d4a; }
+
+.c-bell { fill: #c8642d; }
+.diorama-container.night .c-bell { fill: #8a4a86; }
+
+.c-bell2 { fill: #efc27d; }
+.diorama-container.night .c-bell2 { fill: #d7a3d8; }
+
+.c-mat { fill: #efe3c9; }
+.diorama-container.night .c-mat { fill: #8f8bb6; }
+
+.c-frame { fill: #1c3739; }
+.diorama-container.night .c-frame { fill: #0b0c27; }
+
+/* 悬挂纸片物理系统 */
+.diorama-hang {
+  position: absolute;
+  top: 0;
+  transition: transform 1.6s cubic-bezier(0.5, -0.28, 0.25, 1.22);
+  transition-delay: var(--hd, 0s);
+}
+
+.diorama-swing {
+  position: relative;
+  transform-origin: 50% 0;
+  animation: dioramaSwing var(--sd, 5s) ease-in-out infinite alternate;
+  animation-delay: var(--sdl, 0s);
+}
+
+@keyframes dioramaSwing {
+  from { transform: rotate(-1.6deg); }
+  to { transform: rotate(1.6deg); }
+}
+
+.diorama-string {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1px;
+  margin-left: -0.5px;
+  height: var(--len);
+  background: linear-gradient(rgba(74, 54, 34, 0.25), rgba(74, 54, 34, 0.6));
+}
+
+.diorama-container.night .diorama-string {
+  background: linear-gradient(rgba(220, 220, 255, 0.08), rgba(220, 220, 255, 0.36));
+}
+
+.diorama-hang.day { transform: none; }
+.diorama-container.night .diorama-hang.day {
+  transform: translateY(calc(-1px * var(--up)));
+}
+
+.diorama-hang.nite {
+  transform: translateY(calc(-1px * var(--up)));
+}
+.diorama-container.night .diorama-hang.nite {
+  transform: none;
+}
+
+.diorama-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260%;
+  height: 260%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 236, 190, 0.34) 0%, rgba(255, 236, 190, 0.12) 34%, rgba(255, 236, 190, 0) 66%);
+  pointer-events: none;
+}
+
+/* 翻转飘落双面纸叶 */
+.diorama-leaf {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  filter: drop-shadow(1px 4px 3px var(--diorama-shade));
+  pointer-events: none;
+}
+
+.lf-a { fill: #d9a45b; }
+.diorama-container.night .lf-a { fill: #6c5a8f; }
+
+.lf-b { fill: #c8642d; }
+.diorama-container.night .lf-b { fill: #7a4577; }
+
+.lf-c { fill: #9bb89b; }
+.diorama-container.night .lf-c { fill: #4a569a; }
+
+.lf-v {
+  fill: none;
+  stroke: rgba(255, 246, 226, 0.55);
+  stroke-width: 0.7;
+}
+.diorama-container.night .lf-v {
+  stroke: rgba(210, 210, 255, 0.3);
+}
+
+/* 暗角效果 (Vignette) */
+.diorama-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 16vmin rgba(60, 36, 14, 0.22);
+  transition: box-shadow 1.4s ease;
+}
+.diorama-container.night .diorama-vignette {
+  box-shadow: inset 0 0 22vmin rgba(2, 2, 20, 0.55);
+}
+
+/* 顶部悬挂标牌 (Damped Pendulum Tag) */
+.diorama-tag-wrap {
+  position: absolute;
+  top: 0;
+  left: clamp(20px, 4.5vw, 64px);
+  z-index: 30;
+  transform-origin: 50% 0;
+  will-change: transform;
+  filter: drop-shadow(2px 8px 8px var(--diorama-shade));
+  pointer-events: none;
+}
+
+.diorama-tag-string {
+  display: block;
+  margin: 0 auto;
+  width: 1px;
+  height: clamp(24px, 4.5vh, 48px);
+  background: linear-gradient(rgba(74, 54, 34, 0.25), rgba(74, 54, 34, 0.75));
+}
+.diorama-container.night .diorama-tag-string {
+  background: linear-gradient(rgba(230, 230, 255, 0.1), rgba(230, 230, 255, 0.5));
+}
+
+.diorama-tag {
+  position: relative;
+  width: clamp(200px, 20vw, 260px);
+  padding: 38px 18px 18px;
+  text-align: center;
+  background: #f8efdb;
+  color: var(--diorama-ink);
+  clip-path: polygon(24% 0, 76% 0, 100% 16%, 100% 100%, 0 100%, 0 16%);
+  transition: background-color 1.2s ease, color 1.2s ease;
+  pointer-events: auto;
+}
+.diorama-container.night .diorama-tag {
+  background: #e7e1ef;
+  color: #2a2644;
+}
+
+.diorama-tag::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px dashed rgba(122, 78, 40, 0.35);
+  clip-path: polygon(23% 0, 77% 0, 100% 15%, 100% 100%, 0 100%, 0 15%);
+  pointer-events: none;
+}
+
+.diorama-tag-hole {
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: #1f3a3c;
+  box-shadow: 0 0 0 3px var(--diorama-ochre), 0 0 0 4px rgba(90, 56, 24, 0.35);
+  transition: background-color 1.2s ease;
+}
+.diorama-container.night .diorama-tag-hole {
+  background: #141841;
+}
+
+.diorama-tag-knot {
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  width: 1px;
+  height: 20px;
+  margin-left: -0.5px;
+  background: rgba(74, 54, 34, 0.7);
+}
+
+/* 动物真实物理水纹扩散动画 */
+@keyframes dioramaRipplePulse {
+  0% {
+    transform: scale(0.82);
+    opacity: 0.85;
+  }
+  60% {
+    transform: scale(1.18);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1.42);
+    opacity: 0;
+  }
+}
+
+.diorama-ripple-pulse {
+  transform-origin: center;
+  animation: dioramaRipplePulse 3.2s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+
+.diorama-ripple-pulse-delayed {
+  transform-origin: center;
+  animation: dioramaRipplePulse 3.2s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+  animation-delay: 1.6s;
+}
+
+/* 动物接触面手剪阴影 */
+.diorama-ground-shadow {
+  filter: blur(1.5px);
+  mix-blend-mode: multiply;
+}
+
+
