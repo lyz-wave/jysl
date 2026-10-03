@@ -15,14 +15,14 @@ import {
 interface MemoryListProps {
   memories: Memory[];
   onSelectMemory: (memory: Memory) => void;
-  selectedYear: number | null;
-  onSelectYear: (year: number | null) => void;
+  selectedYear?: number | null;
+  onSelectYear?: (year: number | null) => void;
 }
 
 export const MemoryList: React.FC<MemoryListProps> = ({
   memories,
   onSelectMemory,
-  selectedYear,
+  selectedYear = null,
   onSelectYear,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');

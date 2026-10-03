@@ -22,7 +22,7 @@ import {
   ANIMAL_HABITATS,
   AnimalRoamState,
 } from '@/lib/roamingEngine';
-import { Scissors, Sun, Moon, Sparkles, Compass } from 'lucide-react';
+import { Scissors, Sun, Moon, Sparkles, Compass, Settings } from 'lucide-react';
 
 interface AnimalPlacement {
   id: AnimalId;
@@ -313,6 +313,7 @@ interface SceneStageProps {
   isUserTyping?: boolean;
   onRangerClick?: () => void;
   onStartCampfire?: () => void;
+  onOpenSettings?: () => void;
 }
 
 interface LeafParticle {
@@ -344,6 +345,7 @@ export const SceneStage: React.FC<SceneStageProps> = ({
   isUserTyping = false,
   onRangerClick,
   onStartCampfire,
+  onOpenSettings,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const fliesCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -2123,6 +2125,21 @@ export const SceneStage: React.FC<SceneStageProps> = ({
 
         {/* ==================== 右下角精工纸艺控制舵 ==================== */}
         <div className="absolute right-4 bottom-4 z-40 flex items-center gap-2 pointer-events-auto">
+          {/* 森林设置按钮 */}
+          {onOpenSettings && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenSettings();
+              }}
+              title="打开森林设置 (Settings)"
+              className="px-3 py-2 rounded-2xl bg-[#FAF7EE] text-[#4D3524] border border-[#8C6648]/40 shadow-md hover:bg-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold paper-press-btn"
+            >
+              <Settings className="w-3.5 h-3.5 text-[#38662F]" />
+              <span className="hidden sm:inline">设置</span>
+            </button>
+          )}
+
           {/* 重塑森林剪刀按钮 */}
           <button
             onClick={(e) => {

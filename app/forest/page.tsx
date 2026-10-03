@@ -1,21 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Compass,
-  TreePine,
-  Sun,
-  Moon,
-  Sunset,
-  Sunrise,
   Send,
   Sparkles,
-  ArrowRight,
-  RotateCcw,
-  Volume2,
-  VolumeX,
   Layers,
 } from 'lucide-react';
 import { AnimalId, PuppetAnimationMood, TimeOfDay, Speaker, Memory } from '@/lib/types';
@@ -41,6 +30,8 @@ import { GatheringCircle } from '@/components/dialogue/GatheringCircle';
 import { RoundtableDialogue } from '@/components/dialogue/RoundtableDialogue';
 import { SafetyCrisisModal } from '@/components/dialogue/SafetyCrisisModal';
 import { GrowthCard } from '@/components/rings/GrowthCard';
+import { SettingsModal } from '@/components/settings/SettingsModal';
+import { RingsModal } from '@/components/rings/RingsModal';
 
 export default function ForestPage() {
   const {
@@ -76,6 +67,10 @@ export default function ForestPage() {
   const [showGrowthCardModal, setShowGrowthCardModal] = useState(false);
   const [activeSpeaker, setActiveSpeaker] = useState<Speaker | null>(null);
   const [selectedCampfireSpeaker, setSelectedCampfireSpeaker] = useState<Speaker | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isRingsModalOpen, setIsRingsModalOpen] = useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   // 初始化加载用户 Profile 与检查暂存会话
   useEffect(() => {
@@ -248,7 +243,7 @@ export default function ForestPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FAF7EE] text-[#4D3524] relative overflow-x-hidden flex flex-col justify-between pb-10">
+    <main className="w-screen h-screen overflow-hidden bg-[#FAF7EE] text-[#4D3524] relative flex flex-col items-center justify-center p-0 sm:p-2 select-none">
       <PaperTexture opacity={0.35} />
 
       {/* 首次入林引导弹窗 */}
@@ -271,115 +266,26 @@ export default function ForestPage() {
         </GameModal>
       )}
 
-      {/* 顶部轻量状态栏 */}
-      <header className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-5 pb-3 flex items-center justify-between border-b border-[#E8DEC8]/80 select-none">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-85">
-            <span className="text-2xl">🍃</span>
-            <span className="font-bold text-lg text-[#3B2D25]">解忧森林</span>
-          </Link>
-          {profile && (
-            <span className="hidden sm:inline px-2.5 py-0.5 text-xs rounded-full bg-[#E5EFE3] text-[#2F5927] font-semibold border border-[#38662F]/20">
-              旅人：{profile.nickname} · 伙伴：{ANIMALS[profile.companion]?.name}
-            </span>
-          )}
-        </div>
+      {/* 森林统一设置弹窗 (所有功能归集于此，页面纯粹一体) */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onOpenRings={() => setIsRingsModalOpen(true)}
+        onOpenOnboarding={() => setShowOnboardingModal(true)}
+        isMuted={isMuted}
+        onToggleMute={() => setIsMuted(!isMuted)}
+      />
 
-        {/* 右侧环境时段与样板页入口 */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* 四时时段快捷切换按钮 */}
-          <div className="flex items-center gap-1 p-1 rounded-full bg-white/70 border border-[#E8DEC8]">
-            {(
-              [
-                ['dawn', Sunrise, '清晨'],
-                ['noon', Sun, '正午'],
-                ['dusk', Sunset, '黄昏'],
-                ['night', Moon, '夜晚'],
-              ] as const
-            ).map(([t, Icon, tip]) => (
-              <button
-                key={t}
-                onClick={() => setTimeOfDay(t as TimeOfDay)}
-                title={tip}
-                className={`p-1.5 rounded-full transition-all cursor-pointer ${
-                  timeOfDay === t
-                    ? 'bg-[#38662F] text-white shadow-xs'
-                    : 'text-[#7A583E] hover:bg-stone-100'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-              </button>
-            ))}
-          </div>
+      {/* 古树年轮长卷弹窗 (就地在森林中浮现，不跳出页面) */}
+      <RingsModal
+        isOpen={isRingsModalOpen}
+        onClose={() => setIsRingsModalOpen(false)}
+      />
 
-          <Link href="/rings">
-            <PaperButton
-              variant="secondary"
-              size="sm"
-              icon={<TreePine className="w-3.5 h-3.5 text-[#38662F]" />}
-            >
-              古树年轮
-            </PaperButton>
-          </Link>
-          <Link href="/styleguide">
-            <PaperButton variant="outline" size="sm" icon={<Compass className="w-3.5 h-3.5" />}>
-              风格沙盒
-            </PaperButton>
-          </Link>
-
-          {forestStage === 'explore' ? (
-            <PaperButton
-              variant="secondary"
-              size="sm"
-              onClick={() => handleStartVentingFlow()}
-              icon={<span className="text-xs animate-pulse">🔥</span>}
-              className="border-[#8C6648]/40 text-[#4D3524] font-bold shadow-xs hover:border-[#8C6648]"
-            >
-              生起篝火夜谈
-            </PaperButton>
-          ) : (
-            <PaperButton
-              variant="outline"
-              size="sm"
-              onClick={handleExitCampfire}
-            >
-              🌿 返回漫步
-            </PaperButton>
-          )}
-        </div>
-      </header>
-
-      {/* 暂存倾诉恢复提醒横条 */}
-      {pausedFound && forestStage === 'explore' && (
-        <div className="max-w-xl mx-auto mt-3 px-4 py-2 rounded-2xl bg-[#FFF6EE] border border-[#EACBB8] flex items-center justify-between gap-3 text-xs shadow-xs">
-          <span className="text-[#5C321E]">
-            🌲 守林人轻声问：「上次那件事，还想在篝火旁接着聊吗？」
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPausedFound(false)}
-              className="text-[#8C6648] hover:underline"
-            >
-              稍后再说
-            </button>
-            <PaperButton
-              variant="primary"
-              size="sm"
-              onClick={() => {
-                setTimeOfDay('night');
-                setForestStage('roundtable');
-              }}
-            >
-              接着聊 ›
-            </PaperButton>
-          </div>
-        </div>
-      )}
-
-      {/* 核心主舞台与一体化交互流 (SceneStage 永不卸载，白天漫步与篝火夜幕在同一舞台内平滑演进) */}
-      <section className="max-w-6xl mx-auto w-full px-4 sm:px-6 pt-3 flex-1 flex flex-col justify-start space-y-6">
+      {/* 核心主舞台与一体化交互流 (SceneStage 永不卸载，贯穿始终) */}
+      <section className="w-full h-full max-w-7xl flex flex-col justify-center items-center relative p-1 sm:p-2">
         {/* 1. 2.5D 森林永续画布 */}
-        <div className="w-full relative">
+        <div className="w-full h-full relative flex items-center justify-center">
           <SceneStage
             timeOfDay={timeOfDay}
             showAllAnimals={true}
@@ -403,6 +309,7 @@ export default function ForestPage() {
               }
             }}
             onStartCampfire={handleStartVentingFlow}
+            onOpenSettings={() => setIsSettingsOpen(true)}
           />
 
           {/* 森林顶端引导指示标签 */}
@@ -681,15 +588,14 @@ export default function ForestPage() {
                           >
                             查看立体年轮卡片
                           </PaperButton>
-                          <Link href="/rings">
-                            <button
-                              type="button"
-                              className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#2B6624] to-[#3E8B34] hover:from-[#21511C] hover:to-[#317329] text-white border border-emerald-300/60 shadow-[0_4px_16px_rgba(43,102,36,0.35),inset_0_1px_1px_rgba(255,255,255,0.6)] text-xs sm:text-sm font-bold transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
-                            >
-                              <Layers className="w-4 h-4" />
-                              <span>前往古树年轮画卷 ›</span>
-                            </button>
-                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => setIsRingsModalOpen(true)}
+                            className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#2B6624] to-[#3E8B34] hover:from-[#21511C] hover:to-[#317329] text-white border border-emerald-300/60 shadow-[0_4px_16px_rgba(43,102,36,0.35),inset_0_1px_1px_rgba(255,255,255,0.6)] text-xs sm:text-sm font-bold transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
+                          >
+                            <Layers className="w-4 h-4" />
+                            <span>前往古树年轮画卷 ›</span>
+                          </button>
                           <PaperButton
                             variant="outline"
                             size="md"
@@ -717,32 +623,6 @@ export default function ForestPage() {
             )}
           </AnimatePresence>
         </div>
-
-        {/* 2. 自由探索模式下林间快捷通道 (仅白天漫步时显示) */}
-        {forestStage === 'explore' && (
-          <div className="w-full flex flex-col sm:flex-row items-center justify-center gap-4 pt-1">
-            <PaperButton
-              variant="secondary"
-              size="md"
-              onClick={() => handleStartVentingFlow()}
-              icon={<span className="text-base animate-pulse">🔥</span>}
-              className="w-full sm:w-auto px-6 border-[#8C6648]/40 hover:border-[#8C6648] text-[#4A3220] shadow-xs font-semibold"
-            >
-              生起篝火夜谈（7位伙伴与守林人）
-            </PaperButton>
-
-            <Link href="/rings">
-              <PaperButton
-                variant="outline"
-                size="md"
-                icon={<TreePine className="w-4 h-4 text-[#38662F]" />}
-                className="w-full sm:w-auto shadow-xs"
-              >
-                🌳 岁岁的年轮 (查看成长画卷)
-              </PaperButton>
-            </Link>
-          </div>
-        )}
       </section>
 
       {/* 动物角色详情弹出卡片 (探索模式下点击动物时弹出) */}
