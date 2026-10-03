@@ -53,6 +53,7 @@ export default function ForestPage() {
     resolveSession,
     loadPausedSession,
     animalMoods,
+    showFrame,
   } = useForestStore();
 
   const [inspectAnimal, setInspectAnimal] = useState<AnimalId | null>(null);
@@ -243,8 +244,8 @@ export default function ForestPage() {
   };
 
   return (
-    <main className="w-screen h-screen overflow-hidden bg-[#FAF7EE] text-[#4D3524] relative flex flex-col items-center justify-center p-0 sm:p-2 select-none">
-      <PaperTexture opacity={0.35} />
+    <main className="w-screen h-screen overflow-hidden text-[#4D3524] relative flex flex-col items-center justify-center p-0 m-0 select-none">
+      <PaperTexture opacity={0.25} />
 
       {/* 首次入林引导弹窗 */}
       <OnboardingModal />
@@ -282,10 +283,10 @@ export default function ForestPage() {
         onClose={() => setIsRingsModalOpen(false)}
       />
 
-      {/* 核心主舞台与一体化交互流 (SceneStage 永不卸载，贯穿始终) */}
-      <section className="w-full h-full max-w-7xl flex flex-col justify-center items-center relative p-1 sm:p-2">
-        {/* 1. 2.5D 森林永续画布 */}
-        <div className="w-full h-full relative flex items-center justify-center">
+      {/* 核心主舞台与一体化交互流 (SceneStage 填满全屏，贯穿始终) */}
+      <section className="w-full h-full relative p-0 m-0 overflow-hidden">
+        {/* 1. 2.5D 森林永续画布 (铺满屏幕) */}
+        <div className="w-full h-full relative">
           <SceneStage
             timeOfDay={timeOfDay}
             showAllAnimals={true}
@@ -296,6 +297,7 @@ export default function ForestPage() {
             campfireMode={forestStage !== 'explore' && forestStage !== 'game'}
             activeSpeaker={forestStage !== 'explore' ? activeSpeaker : null}
             isUserTyping={isTyping}
+            showFrame={showFrame}
             onAnimalClick={(animalId) => {
               if (forestStage === 'explore') {
                 setInspectAnimal(animalId);
@@ -312,15 +314,15 @@ export default function ForestPage() {
             onOpenSettings={() => setIsSettingsOpen(true)}
           />
 
-          {/* 森林顶端引导指示标签 */}
-          <div className="absolute top-4 left-4 z-40 px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-md text-xs text-[#5C4033] shadow-sm border border-[#E8DEC8] hidden sm:flex items-center gap-2 pointer-events-none">
-            <span className="text-sm">{forestStage !== 'explore' ? '🔥' : '🍃'}</span>
-            <span className="font-semibold">
-              {forestStage !== 'explore'
-                ? '围坐篝火讨论中 · 7位伙伴轮流发言 · 点击火堆旁伙伴可切换倾听'
-                : '7位伙伴全员齐聚森林 · 点击林间任意动物开启互动与小游戏'}
-            </span>
-          </div>
+          {/* 森林顶端引导指示标签 (仅在夜话会话时显示，漫步壁纸态完全隐去) */}
+          {forestStage !== 'explore' && forestStage !== 'game' && (
+            <div className="absolute top-4 left-4 z-40 px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-md text-xs text-[#5C4033] shadow-sm border border-[#E8DEC8] hidden sm:flex items-center gap-2 pointer-events-none">
+              <span className="text-sm">🔥</span>
+              <span className="font-semibold">
+                围坐篝火讨论中 · 7位伙伴轮流发言 · 点击火堆旁伙伴可切换倾听
+              </span>
+            </div>
+          )}
 
           {/* 篝火夜话进行中时的右上角快捷返回按钮 */}
           {forestStage !== 'explore' && forestStage !== 'game' && (
@@ -334,20 +336,6 @@ export default function ForestPage() {
               >
                 <span>🌿</span>
                 <span>暂存并返回</span>
-              </button>
-            </div>
-          )}
-
-          {/* 探索态 (白天漫步) 下，极简融入环境的自然引导胶囊 */}
-          {forestStage === 'explore' && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 pointer-events-auto">
-              <button
-                onClick={() => handleStartVentingFlow()}
-                className="px-4 py-1.5 rounded-full bg-[#FAF7EE]/85 hover:bg-[#FAF7EE] backdrop-blur-xs border border-[#8C6648]/35 hover:border-[#8C6648]/70 text-[#5C402E] hover:text-[#2E1E14] text-xs font-medium shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 group paper-rough-edge"
-              >
-                <span className="text-xs">🪵</span>
-                <span>轻点林间火塘 · 拾柴生起篝火夜话</span>
-                <span className="text-[10px] text-[#8C6648] group-hover:translate-x-0.5 transition-transform">›</span>
               </button>
             </div>
           )}

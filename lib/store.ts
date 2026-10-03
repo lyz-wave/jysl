@@ -33,6 +33,8 @@ interface ForestState {
   setTimeOfDay: (time: TimeOfDay) => void;
   forestStage: ForestStage;
   setForestStage: (stage: ForestStage) => void;
+  showFrame: boolean;
+  setShowFrame: (show: boolean) => void;
 
   // 活跃小游戏状态
   activeGameAnimal: AnimalId | null;
@@ -83,6 +85,9 @@ export const useForestStore = create<ForestState>((set, get) => ({
 
   forestStage: 'explore',
   setForestStage: (forestStage) => set({ forestStage }),
+
+  showFrame: false,
+  setShowFrame: (showFrame) => set({ showFrame }),
 
   activeGameAnimal: null,
   openGame: (animalId) => set({ activeGameAnimal: animalId, forestStage: 'game' }),

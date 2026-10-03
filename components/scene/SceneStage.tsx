@@ -314,6 +314,7 @@ interface SceneStageProps {
   onRangerClick?: () => void;
   onStartCampfire?: () => void;
   onOpenSettings?: () => void;
+  showFrame?: boolean;
 }
 
 interface LeafParticle {
@@ -346,6 +347,7 @@ export const SceneStage: React.FC<SceneStageProps> = ({
   onRangerClick,
   onStartCampfire,
   onOpenSettings,
+  showFrame = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const fliesCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -1060,7 +1062,9 @@ export const SceneStage: React.FC<SceneStageProps> = ({
           triggerLeafBurst(e.clientX - rect.left, e.clientY - rect.top);
         }
       }}
-      className={`relative w-full h-[640px] sm:h-[720px] rounded-3xl overflow-hidden shadow-2xl select-none preserve-3d perspective-stage diorama-container ${
+      className={`relative w-full h-full overflow-hidden select-none preserve-3d perspective-stage diorama-container ${
+        showFrame ? 'rounded-3xl shadow-2xl' : ''
+      } ${
         isNight ? 'night' : ''
       } ${className}`}
       style={{
@@ -2077,51 +2081,55 @@ export const SceneStage: React.FC<SceneStageProps> = ({
           </svg>
         </div>
 
-        {/* ==================== 第 9 层：手工纸框与毛边卡纸衬圈 (L9, Z: +240px) ==================== */}
-        <div
-          className="absolute inset-0 pointer-events-none diorama-cut z-40"
-          style={{ ...getParallaxStyle(2.2), ['--sh' as string]: 9 }}
-        >
-          <svg
-            viewBox={`0 0 ${W} ${H}`}
-            className="w-full h-full overflow-visible"
-          >
-            <path className="c-mat" d={mat} />
-            <path className="c-frame" d={frame} />
-            <path className="opacity-25" fill="url(#dioramaGrainPat)" d={frame} />
-          </svg>
-        </div>
-
-        {/* 纸雕箱体内向暗角 (Vignette) */}
-        <div className="diorama-vignette z-40" />
-
-        {/* ==================== 左上方物理悬挂式便签标牌 (Tag Pendulum) ==================== */}
-        <div
-          className="diorama-tag-wrap"
-          style={{ transform: `rotate(${renderedTagAngle.toFixed(2)}deg)` }}
-        >
-          <span className="diorama-tag-string" />
-          <div className="diorama-tag paper-rough-edge">
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none"
-              aria-hidden="true"
+        {/* ==================== 第 9 层：手工纸框与毛边卡纸衬圈 (L9, 仅在开启画框模式时显示) ==================== */}
+        {showFrame && (
+          <>
+            <div
+              className="absolute inset-0 pointer-events-none diorama-cut z-40"
+              style={{ ...getParallaxStyle(2.2), ['--sh' as string]: 9 }}
             >
-              <rect width="100%" height="100%" fill="url(#dioramaGrainPat)" />
-            </svg>
-            <span className="diorama-tag-knot" />
-            <span className="diorama-tag-hole" />
-            <p className="m-0 text-[10px] tracking-[0.2em] uppercase font-bold text-[#A3431F]">
-              Plate XVIII · 治愈系剪纸西洋景
-            </p>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#3B2D25] my-1">
-              解忧<em>森林</em>
-            </h2>
-            <div className="w-10 h-1 mx-auto my-1.5 bg-[#5F7F5B]/30 rounded-full" />
-            <p className="text-[11px] leading-relaxed text-[#5C4632] italic max-w-[20ch] mx-auto">
-              九层叠纸 · 慢流小溪 · 7只温热动物伙伴
-            </p>
-          </div>
-        </div>
+              <svg
+                viewBox={`0 0 ${W} ${H}`}
+                className="w-full h-full overflow-visible"
+              >
+                <path className="c-mat" d={mat} />
+                <path className="c-frame" d={frame} />
+                <path className="opacity-25" fill="url(#dioramaGrainPat)" d={frame} />
+              </svg>
+            </div>
+
+            {/* 纸雕箱体内向暗角 (Vignette) */}
+            <div className="diorama-vignette z-40" />
+
+            {/* 左上方物理悬挂式便签标牌 (Tag Pendulum) */}
+            <div
+              className="diorama-tag-wrap"
+              style={{ transform: `rotate(${renderedTagAngle.toFixed(2)}deg)` }}
+            >
+              <span className="diorama-tag-string" />
+              <div className="diorama-tag paper-rough-edge">
+                <svg
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  aria-hidden="true"
+                >
+                  <rect width="100%" height="100%" fill="url(#dioramaGrainPat)" />
+                </svg>
+                <span className="diorama-tag-knot" />
+                <span className="diorama-tag-hole" />
+                <p className="m-0 text-[10px] tracking-[0.2em] uppercase font-bold text-[#A3431F]">
+                  Plate XVIII · 治愈系剪纸西洋景
+                </p>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#3B2D25] my-1">
+                  解忧<em>森林</em>
+                </h2>
+                <div className="w-10 h-1 mx-auto my-1.5 bg-[#5F7F5B]/30 rounded-full" />
+                <p className="text-[11px] leading-relaxed text-[#5C4632] italic max-w-[20ch] mx-auto">
+                  九层叠纸 · 慢流小溪 · 7只温热动物伙伴
+                </p>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* ==================== 右下角精工纸艺控制舵 ==================== */}
         <div className="absolute right-4 bottom-4 z-40 flex items-center gap-2 pointer-events-auto">

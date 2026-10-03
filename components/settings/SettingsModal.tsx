@@ -41,7 +41,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   isMuted,
   onToggleMute,
 }) => {
-  const { timeOfDay, setTimeOfDay, profile, loadProfile } = useForestStore();
+  const { timeOfDay, setTimeOfDay, profile, loadProfile, showFrame, setShowFrame } =
+    useForestStore();
   const [activeTab, setActiveTab] = useState<'time' | 'wallpaper' | 'profile' | 'rings'>('time');
   const [syncSystemTime, setSyncSystemTime] = useState(true);
   const [nicknameInput, setNicknameInput] = useState('');
@@ -375,6 +376,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </button>
                     </>
                   )}
+                </div>
+
+                {/* 周围边框与画框控制 */}
+                <div className="p-3.5 rounded-2xl bg-white/45 backdrop-blur-md border border-white/70 flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <span className="font-bold text-xs text-[#28180E] block">
+                      🖼️ 外围装裱画框与吊牌
+                    </span>
+                    <p className="text-[11px] text-[#6E472B]">
+                      {showFrame
+                        ? '已开启：边缘呈现复古剪纸画框与展厅吊牌'
+                        : '已关闭（默认）：画面全屏无缝铺满，无任何周围边框遮挡'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowFrame(!showFrame)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+                      showFrame
+                        ? 'bg-amber-500/20 border-amber-600/40 text-amber-950'
+                        : 'bg-emerald-500/20 border-emerald-600/40 text-emerald-950'
+                    }`}
+                  >
+                    {showFrame ? '显示画框' : '无边框铺满'}
+                  </button>
                 </div>
               </div>
             )}
