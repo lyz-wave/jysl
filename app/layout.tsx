@@ -26,10 +26,12 @@ export default function RootLayout({
       <head>
         <meta
           name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className="min-h-full flex flex-col bg-[#FAF7EE] text-[#4D3524] font-wenkai selection:bg-[#E5EFE3] selection:text-[#23481F]">
+      <body className="min-h-full flex flex-col bg-[#FAF7EE] text-[#4D3524] font-wenkai selection:bg-[#E5EFE3] selection:text-[#23481F] overscroll-none touch-manipulation">
         {children}
       </body>
     </html>

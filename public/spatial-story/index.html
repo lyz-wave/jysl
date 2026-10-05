@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#051014" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>山海之息 · 一滴水的时空漫游</title>
+  
+  <link rel="stylesheet" href="./css/style.css" />
+  <!-- 本地免网络 Three.js 引擎 -->
+  <script src="./libs/three.min.js"></script>
+</head>
+<body>
+  <div id="app-container">
+    <!-- WebGL 3D 浮空山水画布容器 -->
+    <div id="webgl-container"></div>
+
+    <!-- 顶栏：体感仪表盘与音效控制 -->
+    <div id="top-bar">
+      <div class="sensor-hud">
+        <span id="hud-mode" class="hud-badge">体感</span>
+        <span class="hud-val">俯仰 <b id="hud-beta">0°</b></span>
+        <span class="hud-val">倾角 <b id="hud-gamma">0°</b></span>
+        <span class="hud-val">G值 <b id="hud-g">9.8G</b></span>
+      </div>
+      <button id="btn-sound" class="icon-btn" aria-label="切换声音">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 顶部章节进度条 -->
+    <div id="progress-track">
+      <div id="progress-bar"></div>
+    </div>
+
+    <!-- 历史年份流转悬浮窗 (第5幕) -->
+    <div id="year-dial" class="hidden">
+      <span id="year-val">公元前 5474 年</span>
+    </div>
+
+    <!-- 底部主叙事卡片 HUD -->
+    <div id="story-hud" class="hidden">
+      <div id="story-card" class="glass-card">
+        <div class="card-top">
+          <span id="chap-badge" class="chap-badge">01 / 06</span>
+          <span id="chap-sub" class="chap-sub">北秦岭 · 南巴山 · 汉水中流</span>
+        </div>
+        <h2 id="chap-title" class="chap-title">第一幕 · 云生</h2>
+        <p id="chap-poem" class="chap-poem">山河未名，长风浩荡。</p>
+        <div id="chap-hint" class="action-pill">
+          <i></i><span>【端平手机】 让风停一停，水汽凝滴</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 封面欢迎页 (兼具 iOS 音频与传感器手势激活) -->
+    <div id="intro-cover">
+      <div class="intro-header">
+        <div class="brand-badge">
+          <span class="spark-dot"></span>
+          <span>东方意境 · 多模态空间叙事</span>
+        </div>
+        <h1 class="intro-title">山海之息</h1>
+        <p class="intro-desc">一滴水的七千五百年 · 时空漫游<br>建议佩戴耳机 · 支持重力体感</p>
+      </div>
+
+      <div class="intro-footer">
+        <button id="btn-enter" class="btn-primary">
+          <span>启程入画</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+        <span class="tip-label">轻触后请允许动作与方向权限以体验体感</span>
+      </div>
+    </div>
+
+    <!-- 终幕：专属溯源证书模态弹窗 -->
+    <div id="certificate-modal" class="hidden">
+      <div class="cert-card-wrap">
+        <canvas id="cert-canvas"></canvas>
+        <div class="cert-actions">
+          <button id="btn-save-cert" class="btn-primary">保存铭文证书</button>
+          <button id="btn-replay" class="btn-secondary">再次游历</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 竖屏观看提示 -->
+    <div id="rotate-hint">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="5" y="2" width="14" height="20" rx="3"></rect>
+        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      </svg>
+      <h3>请将手机旋转至竖屏观看</h3>
+    </div>
+  </div>
+
+  <!-- 主程序入口 -->
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

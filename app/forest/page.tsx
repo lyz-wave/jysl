@@ -11,6 +11,7 @@ import { AnimalId, PuppetAnimationMood, TimeOfDay, Speaker, Memory } from '@/lib
 import { ANIMALS } from '@/lib/animals';
 import { db, saveUserProfile } from '@/lib/db';
 import { useForestStore } from '@/lib/store';
+import { getMockRoundtable, getMockDistill } from '@/lib/prompts';
 import { SceneStage } from '@/components/scene/SceneStage';
 import { PaperTexture } from '@/components/paper/PaperTexture';
 import { PaperButton } from '@/components/paper/PaperButton';
@@ -141,9 +142,34 @@ export default function ForestPage() {
         await db.memories.put(memory);
         setDistilledMemory(memory);
         setShowGrowthCardModal(true);
+      } else {
+        throw new Error('Distill returned empty response');
       }
     } catch (err) {
-      console.error('Distill error:', err);
+      console.warn('Distill API fallback to local mock:', err);
+      const userMsg =
+        currentSession.messages.find((m) => m.speaker === 'user')?.content ||
+        ventingText;
+      const mockResult = getMockDistill({
+        sessionId: currentSession.id,
+        nickname: profile?.nickname || '旅人',
+        userInput: userMsg,
+        messages: currentSession.messages,
+        moodBefore: currentSession.moodBefore,
+        moodAfter: score ?? currentSession.moodAfter ?? 7,
+        gameContext: currentSession.gameContext,
+      });
+      const memory: Memory = {
+        id: `mem_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        sessionId: currentSession.id,
+        date: new Date().toISOString().split('T')[0],
+        moodBefore: currentSession.moodBefore,
+        moodAfter: score ?? currentSession.moodAfter ?? 7,
+        ...mockResult,
+      };
+      await db.memories.put(memory);
+      setDistilledMemory(memory);
+      setShowGrowthCardModal(true);
     } finally {
       setIsDistilling(false);
       await resolveSession();
@@ -212,9 +238,32 @@ export default function ForestPage() {
           });
         }
         setForestStage('roundtable');
+        return;
       }
+      throw new Error('Roundtable returned invalid response');
     } catch (err) {
-      console.error('Roundtable error:', err);
+      console.warn('Roundtable API fallback to local mock:', err);
+      const mockResult = getMockRoundtable({
+        nickname: profile?.nickname || '旅人',
+        companion: currentSession.companion,
+        userInput: text,
+        gameContext: currentSession.gameContext,
+        moodScore: currentSession.moodBefore,
+      });
+      for (const sp of mockResult.speeches) {
+        addMessage({
+          speaker: sp.animal,
+          content: sp.text,
+          mood: sp.mood,
+        });
+      }
+      if (mockResult.treeSummary) {
+        addMessage({
+          speaker: 'ranger',
+          content: mockResult.treeSummary,
+        });
+      }
+      setForestStage('roundtable');
     } finally {
       setIsSubmittingVenting(false);
       setVentingText('');

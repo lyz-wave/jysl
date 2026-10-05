@@ -220,19 +220,25 @@ export function computeCampfireSeats(W: number, H: number): {
   ranger: CampfireSeatGeometry;
   seats: Record<AnimalId, CampfireSeatGeometry>;
 } {
+  const isMobile = W < 640;
   const fireX = Math.round(W * 0.50);
-  const fireY = Math.round(H * 0.825);
-  const Rx = Math.min(260, Math.max(160, Math.round(W * 0.26)));
-  const Ry = Math.min(52, Math.max(34, Math.round(H * 0.058)));
+  const fireY = Math.round(H * (isMobile ? 0.835 : 0.825));
+  const Rx = isMobile
+    ? Math.min(150, Math.max(90, Math.round(W * 0.38)))
+    : Math.min(260, Math.max(160, Math.round(W * 0.26)));
+  const Ry = isMobile
+    ? Math.min(46, Math.max(26, Math.round(H * 0.052)))
+    : Math.min(52, Math.max(34, Math.round(H * 0.058)));
+  const sc = isMobile ? 0.74 : 1.0;
 
   return {
     fireX,
     fireY,
     ranger: {
       x: fireX,
-      y: fireY - Ry - 24,
+      y: fireY - Ry - (isMobile ? 18 : 24),
       facing: 1,
-      scale: 0.84,
+      scale: 0.84 * sc,
       zIndex: 22,
       perchType: 'log',
     },
@@ -241,7 +247,7 @@ export function computeCampfireSeats(W: number, H: number): {
         x: Math.round(fireX - Rx * 0.66),
         y: Math.round(fireY - Ry * 0.68),
         facing: 1,
-        scale: 0.78,
+        scale: 0.78 * sc,
         zIndex: 24,
         perchType: 'stump',
       },
@@ -249,7 +255,7 @@ export function computeCampfireSeats(W: number, H: number): {
         x: Math.round(fireX + Rx * 0.66),
         y: Math.round(fireY - Ry * 0.68),
         facing: -1,
-        scale: 0.80,
+        scale: 0.80 * sc,
         zIndex: 24,
         perchType: 'stone',
       },
@@ -257,7 +263,7 @@ export function computeCampfireSeats(W: number, H: number): {
         x: Math.round(fireX - Rx * 0.92),
         y: Math.round(fireY - 4),
         facing: 1,
-        scale: 0.94,
+        scale: 0.94 * sc,
         zIndex: 30,
         perchType: 'moss',
       },
@@ -265,7 +271,7 @@ export function computeCampfireSeats(W: number, H: number): {
         x: Math.round(fireX + Rx * 0.92),
         y: Math.round(fireY - 4),
         facing: -1,
-        scale: 0.88,
+        scale: 0.88 * sc,
         zIndex: 30,
         perchType: 'moss',
       },
@@ -273,7 +279,7 @@ export function computeCampfireSeats(W: number, H: number): {
         x: Math.round(fireX - Rx * 0.62),
         y: Math.round(fireY + Ry * 0.68),
         facing: 1,
-        scale: 0.84,
+        scale: 0.84 * sc,
         zIndex: 36,
         perchType: 'stone',
       },
@@ -281,7 +287,7 @@ export function computeCampfireSeats(W: number, H: number): {
         x: Math.round(fireX + Rx * 0.62),
         y: Math.round(fireY + Ry * 0.68),
         facing: -1,
-        scale: 0.76,
+        scale: 0.76 * sc,
         zIndex: 36,
         perchType: 'moss',
       },
@@ -289,7 +295,7 @@ export function computeCampfireSeats(W: number, H: number): {
         x: fireX,
         y: Math.round(fireY + Ry * 0.86),
         facing: 1,
-        scale: 0.80,
+        scale: 0.80 * sc,
         zIndex: 38,
         perchType: 'moss',
       },
@@ -517,6 +523,58 @@ export const SceneStage: React.FC<SceneStageProps> = ({
     if (!reducedMotion) {
       setMouseRatio({ x: 0, y: 0 });
     }
+  }, [reducedMotion]);
+
+  // 移动端触摸滑动交互 (Touch Parallax)
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (reducedMotion || !containerRef.current || !e.touches[0]) return;
+      const touch = e.touches[0];
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = (touch.clientX - rect.left) / rect.width - 0.5;
+      const y = (touch.clientY - rect.top) / rect.height - 0.5;
+      setMouseRatio({
+        x: Math.max(-0.5, Math.min(0.5, x)),
+        y: Math.max(-0.5, Math.min(0.5, y)),
+      });
+    },
+    [reducedMotion]
+  );
+
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      if (!containerRef.current || !e.touches[0]) return;
+      const touch = e.touches[0];
+      const rect = containerRef.current.getBoundingClientRect();
+      triggerLeafBurst(touch.clientX - rect.left, touch.clientY - rect.top);
+    },
+    []
+  );
+
+  // 移动端陀螺仪重力感应视差 (DeviceOrientation Hologram Effect)
+  useEffect(() => {
+    if (reducedMotion) return;
+
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma === null || e.beta === null) return;
+      // gamma: 左右倾斜 [-90, 90] => 映射为 -0.5 ~ 0.5
+      const gx = (Math.max(-30, Math.min(30, e.gamma)) / 30) * 0.45;
+      // beta: 前后仰角 (默认拿手机仰角在 40~50 度之间)
+      const gy = (Math.max(-30, Math.min(30, e.beta - 45)) / 30) * 0.45;
+      setMouseRatio((prev) => ({
+        x: prev.x * 0.82 + gx * 0.18,
+        y: prev.y * 0.82 + gy * 0.18,
+      }));
+    };
+
+    if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+    return () => {
+      if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
+        window.removeEventListener('deviceorientation', handleOrientation);
+      }
+    };
   }, [reducedMotion]);
 
   // 自动呼吸缓动漂移
@@ -1056,6 +1114,8 @@ export const SceneStage: React.FC<SceneStageProps> = ({
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchMove={handleTouchMove}
+      onTouchStart={handleTouchStart}
       onClick={(e) => {
         const rect = containerRef.current?.getBoundingClientRect();
         if (rect) {
@@ -2131,8 +2191,8 @@ export const SceneStage: React.FC<SceneStageProps> = ({
           </>
         )}
 
-        {/* ==================== 右下角精工纸艺控制舵 ==================== */}
-        <div className="absolute right-4 bottom-4 z-40 flex items-center gap-2 pointer-events-auto">
+        {/* ==================== 右下角精工纸艺控制舵 (适配移动端安全区域与触控尺寸) ==================== */}
+        <div className="absolute right-[calc(1rem+env(safe-area-inset-right,0px))] bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] z-40 flex items-center gap-2 pointer-events-auto">
           {/* 森林设置按钮 */}
           {onOpenSettings && (
             <button
@@ -2141,9 +2201,9 @@ export const SceneStage: React.FC<SceneStageProps> = ({
                 onOpenSettings();
               }}
               title="打开森林设置 (Settings)"
-              className="px-3 py-2 rounded-2xl bg-[#FAF7EE] text-[#4D3524] border border-[#8C6648]/40 shadow-md hover:bg-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold paper-press-btn"
+              className="px-3.5 py-2.5 rounded-2xl bg-[#FAF7EE]/90 hover:bg-white text-[#4D3524] border border-[#8C6648]/40 shadow-md backdrop-blur-md transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold paper-press-btn active:scale-95 touch-manipulation min-h-[38px]"
             >
-              <Settings className="w-3.5 h-3.5 text-[#38662F]" />
+              <Settings className="w-4 h-4 text-[#38662F]" />
               <span className="hidden sm:inline">设置</span>
             </button>
           )}
@@ -2155,9 +2215,9 @@ export const SceneStage: React.FC<SceneStageProps> = ({
               handleRecutForest();
             }}
             title="重新修剪森林图案 (Recut)"
-            className="px-3 py-2 rounded-2xl bg-[#FAF7EE] text-[#4D3524] border border-[#8C6648]/40 shadow-md hover:bg-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold paper-press-btn"
+            className="px-3.5 py-2.5 rounded-2xl bg-[#FAF7EE]/90 hover:bg-white text-[#4D3524] border border-[#8C6648]/40 shadow-md backdrop-blur-md transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold paper-press-btn active:scale-95 touch-manipulation min-h-[38px]"
           >
-            <Scissors className="w-3.5 h-3.5 text-[#A3431F]" />
+            <Scissors className="w-4 h-4 text-[#A3431F]" />
             <span className="hidden sm:inline">重剪森林</span>
           </button>
         </div>

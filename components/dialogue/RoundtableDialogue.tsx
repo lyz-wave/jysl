@@ -10,6 +10,7 @@ import {
 } from '@/lib/types';
 import { ANIMALS } from '@/lib/animals';
 import { useForestStore } from '@/lib/store';
+import { getMockFollowup } from '@/lib/prompts';
 import { GatheringCircle } from './GatheringCircle';
 import { RangerSummaryCard } from './RangerSummaryCard';
 import { VoiceInput } from './VoiceInput';
@@ -154,12 +155,24 @@ export const RoundtableDialogue: React.FC<RoundtableDialogueProps> = ({
           content: data.reply,
           mood: 'gentle',
         });
+      } else {
+        throw new Error('Followup returned empty reply');
       }
     } catch (err) {
-      console.error('Followup request failed:', err);
+      console.warn('Followup request fallback to local mock:', err);
+      const fallbackReply = getMockFollowup({
+        nickname: '旅人',
+        targetSpeaker: targetedSpeaker,
+        userInput: userText,
+        history: currentSession.messages.map((m) => ({
+          speaker: m.speaker,
+          content: m.content,
+        })),
+      });
       addMessage({
         speaker: targetedSpeaker,
-        content: '（微风吹过枝丫）风太大了没听清，能再说一次吗？',
+        content: fallbackReply,
+        mood: 'gentle',
       });
     } finally {
       setIsWaitingFollowup(false);

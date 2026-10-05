@@ -151,14 +151,15 @@ export function buildSafetyPrompt(userInput: string): string {
 }
 
 // 4. 本地 Mock 降级数据（当无 API Key 或网络不可用时使用，保证永远可运行）
-export function getMockRoundtable(input: RoundtableInput): RoundtableResponse {
-  const comp = input.companion;
-  const companionInfo = ANIMALS[comp];
+export function getMockRoundtable(input: Partial<RoundtableInput> = {}): RoundtableResponse {
+  const comp: AnimalId = (input.companion && input.companion in ANIMALS) ? input.companion : 'bear';
+  const companionInfo = ANIMALS[comp] || ANIMALS.bear;
+  const nickname = input.nickname || '朋友';
 
   const mockSpeeches: RoundtableAnimalSpeech[] = [
     {
       animal: comp,
-      text: `（${companionInfo.name}轻轻眨了眨眼睛）${input.nickname}，我听到了。心里的委屈和紧绷都是真实的信号，不是你的敌人，今天有我们在呢。`,
+      text: `（${companionInfo.name}轻轻眨了眨眼睛）${nickname}，我听到了。心里的委屈和紧绷都是真实的信号，不是你的敌人，今天有我们在呢。`,
       mood: 'gentle',
     },
     {
@@ -217,12 +218,13 @@ export function getMockRoundtable(input: RoundtableInput): RoundtableResponse {
   };
 }
 
-export function getMockFollowup(input: FollowupInput): string {
+export function getMockFollowup(input: Partial<FollowupInput> = {}): string {
+  const userInput = input.userInput || '';
   if (
-    input.userInput.includes('想通') ||
-    input.userInput.includes('好多了') ||
-    input.userInput.includes('舒服') ||
-    input.userInput.includes('谢谢')
+    userInput.includes('想通') ||
+    userInput.includes('好多了') ||
+    userInput.includes('舒服') ||
+    userInput.includes('谢谢')
   ) {
     return `（守林人提起马灯，眼里满是欣慰的笑意）真为你高兴，心头的风暴终于透出了暖阳。这份在迷茫中长出的力量非常珍贵，如果准备好了，可以点击「心结解开了」，老朽帮你把它刻入年轮里，当作永恒的生命底气。`;
   }
@@ -238,15 +240,15 @@ export function getMockFollowup(input: FollowupInput): string {
 
 // 4. 成长记忆提炼 Prompt 生成 (用于沉淀为年轮)
 export function buildDistillPrompt(input: DistillInput): string {
-  const resonatedAnimalList = input.messages
-    .filter((m) => m.resonated && m.speaker in ANIMALS)
+  const resonatedAnimalList = (input.messages || [])
+    .filter((m) => m && m.resonated && m.speaker in ANIMALS)
     .map((m) => ANIMALS[m.speaker as AnimalId]?.name);
 
   return `你是有资深心理学背景（精通CBT认知重构、接纳承诺疗法ACT、自我关怀）的「解忧森林守护者」。
-现在需要你将用户「${input.nickname}」在森林篝火旁经历的这段情绪倾诉与对话，提炼为一条深刻、温暖、可沉淀进生命年轮的「成长记忆」。
+现在需要你将用户「${input.nickname || '朋友'}」在森林篝火旁经历的这段情绪倾诉与对话，提炼为一条深刻、温暖、可沉淀进生命年轮的「成长记忆」。
 
 【用户基本信息与过程】
-- 昵称：${input.nickname}
+- 昵称：${input.nickname || '朋友'}
 - 倾诉前心情分（1-10）：${input.moodBefore ?? '未评'}
 - 释怀后心情分（1-10）：${input.moodAfter ?? '未评'}
 - 触动内心（点赞"说到心里了"）的动物伙伴：${
@@ -255,11 +257,11 @@ export function buildDistillPrompt(input: DistillInput): string {
 ${input.gameContext && input.gameContext.length > 0 ? `- 参与的小游戏积累：${input.gameContext.join('; ')}` : ''}
 
 【用户的原始倾诉】
-"${input.userInput}"
+"${input.userInput || ''}"
 
 【对话中产生的关键视角】
-${input.messages
-  .filter((m) => m.speaker !== 'user')
+${(input.messages || [])
+  .filter((m) => m && m.speaker !== 'user')
   .map((m) => `[${m.speaker}]: ${m.content}`)
   .slice(0, 10)
   .join('\n')}
@@ -296,10 +298,10 @@ ${input.messages
 }
 
 // 5. 本地 Mock 成长记忆提炼
-export function getMockDistill(input: DistillInput): DistillResponse {
-  const text = input.userInput.toLowerCase();
-  const resonated = input.messages
-    .filter((m) => m.resonated && m.speaker in ANIMALS)
+export function getMockDistill(input: Partial<DistillInput> = {}): DistillResponse {
+  const text = (input.userInput || '').toLowerCase();
+  const resonated = (input.messages || [])
+    .filter((m) => m && m.resonated && m.speaker in ANIMALS)
     .map((m) => m.speaker as AnimalId);
 
   // 基础分类推断

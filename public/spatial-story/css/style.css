@@ -1,0 +1,419 @@
+/**
+ * iOS Liquid Glass 风格高级视觉样式
+ * 沉淀自 liquid-glass-ui 与 webar-interactive-experience
+ */
+
+:root {
+  --bg-dark: #051014;
+  --glass-bg: rgba(14, 30, 36, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-hi: rgba(255, 255, 255, 0.28);
+  --gold: #dcb372;
+  --gold-glow: rgba(220, 179, 114, 0.45);
+  --cyan: #4ce0d2;
+  --text-main: #f3f9f9;
+  --text-muted: #95aeb2;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
+}
+
+#app-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#webgl-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ================= 封面欢迎层 (Intro Cover) ================= */
+#intro-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top) + 60px) 24px calc(env(safe-area-inset-bottom) + 50px);
+  background: radial-gradient(circle at 50% 30%, rgba(16, 52, 60, 0.4) 0%, rgba(5, 16, 20, 0.95) 75%);
+  backdrop-filter: blur(8px);
+  transition: opacity 0.8s ease, visibility 0.8s;
+}
+
+.intro-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 24px;
+}
+
+.spark-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+}
+
+.intro-title {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  font-family: "Noto Serif SC", serif;
+  margin-bottom: 12px;
+}
+
+.intro-desc {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  letter-spacing: 1px;
+}
+
+.intro-footer {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-primary {
+  width: 100%;
+  height: 56px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, rgba(220, 179, 114, 0.95), rgba(180, 140, 75, 0.9));
+  color: #102426;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  cursor: pointer;
+  box-shadow: 0 8px 32px var(--gold-glow);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.44, 1);
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+}
+
+.tip-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* ================= 顶栏 HUD 与状态 ================= */
+#top-bar {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 16px);
+  left: 20px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sensor-hud {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.hud-badge {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(76, 224, 210, 0.2);
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+.hud-val {
+  color: var(--text-muted);
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.icon-btn.muted svg {
+  opacity: 0.35;
+}
+
+/* ================= 进度条 ================= */
+#progress-track {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 70px);
+  left: 20px;
+  right: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  z-index: 10;
+  overflow: hidden;
+}
+
+#progress-bar {
+  width: 16.6%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--gold));
+  transition: width 0.6s cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+/* ================= 底部叙事卡片 (Story HUD Card) ================= */
+#story-hud {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom) + 24px);
+  left: 20px;
+  right: 20px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.glass-card {
+  pointer-events: auto;
+  border-radius: 24px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px var(--glass-hi);
+  backdrop-filter: blur(26px) saturate(190%);
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pulse-in {
+  animation: cardFadeIn 0.8s cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+@keyframes cardFadeIn {
+  0% { opacity: 0; transform: translateY(18px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1.0); }
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chap-badge {
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+.chap-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-family: "Noto Serif SC", serif;
+}
+
+.chap-sub {
+  font-size: 13px;
+  color: var(--cyan);
+  letter-spacing: 1px;
+}
+
+.chap-poem {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-family: "Noto Serif SC", serif;
+  margin-top: 4px;
+}
+
+.action-pill {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(220, 179, 114, 0.12);
+  border: 1px solid rgba(220, 179, 114, 0.3);
+  color: #ffeed3;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.action-pill i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: pulseDot 1.4s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+/* ================= 历史年份滚轮 (Chapter 5) ================= */
+#year-dial {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: rgba(8, 24, 30, 0.85);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-size: 22px;
+  font-family: monospace;
+  font-weight: bold;
+  letter-spacing: 2px;
+  box-shadow: 0 0 24px rgba(220, 179, 114, 0.4);
+  z-index: 15;
+}
+
+/* ================= 专属证书结缘模态层 (Certificate Modal) ================= */
+#certificate-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 30;
+  background: rgba(5, 16, 20, 0.94);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.cert-card-wrap {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+#cert-canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+}
+
+.cert-actions {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+}
+
+.btn-secondary {
+  flex: 1;
+  height: 48px;
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* 辅助隐藏 */
+.hidden {
+  display: none !important;
+}
+
+/* ================= 竖屏强制提示 ================= */
+#rotate-hint {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  background: #051014;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  color: #fff;
+  text-align: center;
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  #rotate-hint {
+    display: flex;
+  }
+}
